@@ -1,29 +1,51 @@
 <script>
   import { onMount } from 'svelte'
 
-  let now = $state(new Date())
+  /** @type {string | null} */
+  let expandedLabel = $state(null)
 
   onMount(() => {
-    const interval = setInterval(() => (now = new Date()), 1000)
+    const interval = setInterval(() => {
+      // sensor history and state remain static
+    }, 1000)
     return () => clearInterval(interval)
   })
 
-  const timeString = $derived(now.toLocaleTimeString())
-  const dateString = $derived(
-    now.toLocaleDateString(undefined, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  )
+  const startupTime = new Date()
+  const timeString = startupTime.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  const dateString = startupTime.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
   // dummy sensor readings until real hardware data is wired up
+  /** @type {{ label: string, icon: string, color: string, value: number, min: number, max: number, idealMin: number, idealMax: number, unit: string, step: number, history?: number[] }[]} */
   let sensors = $state([
-    { label: 'Sunlight', icon: '☀️', color: '#f5a623', value: 68, min: 0, max: 100, idealMin: 50, idealMax: 80, unit: '%', step: 2 },
+    { label: 'Sunlight', icon: '☀️', color: '#f5a623', value: 12, min: 0, max: 50, idealMin: 10, idealMax: 30, unit: ' DLI', step: 2 },
     { label: 'Water', icon: '💧', color: '#2f8fd1', value: 42, min: 0, max: 100, idealMin: 40, idealMax: 70, unit: '%', step: 2 },
     { label: 'Temperature', icon: '🌡️', color: '#e5533d', value: 74, min: 32, max: 100, idealMin: 65, idealMax: 80, unit: '°F', step: 1 },
   ])
+
+  /** deterministic wavy sample data so the sparkline/expanded charts render a static graph */
+  /** @param {number} idealMin @param {number} idealMax @param {number} min @param {number} max @param {number} points */
+  function generateHistory(idealMin, idealMax, min, max, points = 40) {
+    const center = (idealMin + idealMax) / 2
+    const amplitude = (idealMax - idealMin) / 2 || (max - min) / 8
+    const history = []
+    for (let i = 0; i < points; i++) {
+      const wave = Math.sin(i / 4) * amplitude * 0.6 + Math.sin(i / 9) * amplitude * 0.3
+      const v = Math.min(max, Math.max(min, Math.round(center + wave)))
+      history.push(v)
+    }
+    return history
+  }
+
+  // initialize static history
+  sensors.forEach((s) => {
+    if (!s.history) s.history = generateHistory(s.idealMin, s.idealMax, s.min, s.max)
+  })
 
   /** @param {number} value @param {number} min @param {number} max */
   function percent(value, min, max) {
@@ -43,6 +65,35 @@
   /** @param {{ value: number, idealMin: number, idealMax: number }} sensor */
   function isOutOfRange(sensor) {
     return sensor.value < sensor.idealMin || sensor.value > sensor.idealMax
+  }
+
+  /** @param {{ label: string }} sensor */
+  function toggleExpand(sensor) {
+    expandedLabel = expandedLabel === sensor.label ? null : sensor.label
+  }
+
+  /** @param {{ history?: number[], value: number }} sensor */
+  function historyStats(sensor) {
+    const h = sensor.history && sensor.history.length ? sensor.history : [sensor.value]
+    const min = Math.min(...h)
+    const max = Math.max(...h)
+    const avg = h.reduce((a, b) => a + b, 0) / h.length
+    return { min, max, avg: Math.round(avg * 10) / 10 }
+  }
+
+  function sparklinePoints(/** @type {number[] | undefined} */ history, w = 120, h = 30) {
+    if (!history || history.length === 0) return ''
+    const len = history.length
+    const min = Math.min(...history)
+    const max = Math.max(...history)
+    const range = max - min || 1
+    return history
+      .map((/** @type {number} */ v, /** @type {number} */ i) => {
+        const x = (i / (len - 1 || 1)) * w
+        const y = h - ((v - min) / range) * h
+        return `${x},${y}`
+      })
+      .join(' ')
   }
 </script>
 
@@ -86,7 +137,15 @@
       <div class="panel-pot-main">
         <div class="sensor-list">
           {#each sensors as sensor}
-            <div class="sensor">
+            <div
+              class="sensor"
+              class:sensor--expanded={expandedLabel === sensor.label}
+              role="button"
+              tabindex="0"
+              aria-expanded={expandedLabel === sensor.label}
+              onclick={() => toggleExpand(sensor)}
+              onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleExpand(sensor)}
+            >
               <div class="sensor-header">
                 <span class="sensor-icon" title={sensor.label} aria-hidden="true">{sensor.icon}</span>
                 <span class="sr-only">{sensor.label}</span>
@@ -110,6 +169,51 @@
                 <span>{sensor.min}{sensor.unit}</span>
                 <span>{sensor.max}{sensor.unit}</span>
               </div>
+              <div class="sensor-sparkline">
+                <svg width="120" height="30" viewBox="0 0 120 30" preserveAspectRatio="none">
+                  <polyline fill="none" stroke="currentColor" stroke-width="1.5" points={sparklinePoints(sensor.history,120,30)} />
+                </svg>
+              </div>
+
+              {#if expandedLabel === sensor.label}
+                {@const stats = historyStats(sensor)}
+                <div class="sensor-expanded" role="group">
+                  <div class="sensor-expanded-chart">
+                    <svg width="100%" height="120" viewBox="0 0 480 120" preserveAspectRatio="none">
+                      <polyline fill="none" stroke="currentColor" stroke-width="2" points={sparklinePoints(sensor.history,480,120)} />
+                    </svg>
+                  </div>
+                  <div class="sensor-stats">
+                    <span>min {stats.min}{sensor.unit}</span>
+                    <span>avg {stats.avg}{sensor.unit}</span>
+                    <span>max {stats.max}{sensor.unit}</span>
+                  </div>
+                  <div class="sensor-expanded-controls">
+                    <label class="slider-label">
+                      Target min
+                      <input
+                        type="range"
+                        min={sensor.min}
+                        max={sensor.max}
+                        step={sensor.step}
+                        value={sensor.idealMin}
+                        oninput={(e) => (sensor.idealMin = Math.min(+e.currentTarget.value, sensor.idealMax))}
+                      />
+                    </label>
+                    <label class="slider-label">
+                      Target max
+                      <input
+                        type="range"
+                        min={sensor.min}
+                        max={sensor.max}
+                        step={sensor.step}
+                        value={sensor.idealMax}
+                        oninput={(e) => (sensor.idealMax = Math.max(+e.currentTarget.value, sensor.idealMin))}
+                      />
+                    </label>
+                  </div>
+                </div>
+              {/if}
             </div>
           {/each}
         </div>
