@@ -52,6 +52,7 @@
   </header>
 
   <main class="panels">
+    <section class="panel panel-phone">Mock secondary device goes here</section>
     <section class="panel panel-pot">
       <div class="panel-pot-lip">
         <div class="pot-top">
@@ -76,8 +77,6 @@
         </div>
       </div>
     </section>
-
-    <section class="panel panel-phone">Mock secondary device goes here (might swap this to the left later)</section>
 
     <section class="panel panel-mockup">Pot image/mockup goes here</section>
   </main>
