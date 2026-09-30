@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { createSensors, adjust, isOutOfRange } from './lib/sensors'
   import Sensor from './components/Sensor.svelte'
+  import PhoneApp from './components/PhoneApp.svelte'
 
   /** @type {string | null} */
   let expandedLabel = $state(null)
@@ -52,10 +53,16 @@
   </header>
 
   <main class="panels">
-    <section class="panel panel-phone">Mock secondary device goes here</section>
+    <section class="panel panel-phone">
+      <PhoneApp />
+    </section>
     <section class="panel panel-pot">
       <div class="panel-pot-lip">
         <div class="pot-top">
+          <div class="pot-clock">
+            <span class="pot-time">{timeString}</span>
+            <span class="pot-date">{dateString}</span>
+          </div>
           <div class="pot-icons">
             {#each sensors as sensor}
               {#if isOutOfRange(sensor)}
@@ -63,10 +70,7 @@
               {/if}
             {/each}
           </div>
-          <div class="pot-clock">
-            <span class="pot-time">{timeString}</span>
-            <span class="pot-date">{dateString}</span>
-          </div>
+          
         </div>
       </div>
       <div class="panel-pot-main">

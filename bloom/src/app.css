@@ -91,7 +91,8 @@ p {
 }
 
 .panel {
-  border-right: 1px solid var(--border);
+  border-right: 4px solid var(--border);
+  border-top: 4px solid var(--border);
   padding: 12px;
   overflow: auto;
 }
