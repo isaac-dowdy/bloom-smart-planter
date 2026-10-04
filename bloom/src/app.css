@@ -394,3 +394,14 @@ p {
 .panel-mockup {
   flex: 1 1 0;
 }
+
+.pot-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.pot-room {
+  font-size: 14px;
+  color: var(--text);
+}

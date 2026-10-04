@@ -1,7 +1,8 @@
 <script>
-  import { createPlants, statusLabel, statusColor, ROOMS } from '../lib/plants'
+  import { statusLabel, statusColor, ROOMS } from '../lib/plants'
 
-  const plants = createPlants()
+  /** @type {{ plants: any[], onSelectPlant?: (id: string) => void }} */
+  let { plants, onSelectPlant } = $props()
 
   /** @type {string | null} */
   let selectedId = $state(null)
@@ -11,6 +12,7 @@
   /** @param {string} id */
   function openPlant(id) {
     selectedId = id
+    onSelectPlant?.(id)
   }
 
   function closePlant() {
@@ -43,12 +45,12 @@
 
       <div class="detail-stats">
         <div class="detail-stat">
-          <span>💧 Water</span>
-          <strong>{selected.water}%</strong>
-        </div>
-        <div class="detail-stat">
           <span>☀️ Light</span>
           <strong>{selected.light} DLI</strong>
+        </div>
+        <div class="detail-stat">
+          <span>💧 Water</span>
+          <strong>{selected.water}%</strong>
         </div>
         <div class="detail-stat">
           <span>🌡️ Temp</span>
@@ -60,30 +62,6 @@
 
       <div class="detail-section">
         <h3>Care thresholds</h3>
-
-        <div class="threshold-row">
-          <span class="threshold-label">💧 Water %</span>
-          <label class="threshold-field">
-            Min
-            <input
-              type="number"
-              min="0"
-              max="100"
-              bind:value={selected.waterMin}
-              onchange={() => { if (selected.waterMin > selected.waterMax) selected.waterMax = selected.waterMin }}
-            />
-          </label>
-          <label class="threshold-field">
-            Max
-            <input
-              type="number"
-              min="0"
-              max="100"
-              bind:value={selected.waterMax}
-              onchange={() => { if (selected.waterMax < selected.waterMin) selected.waterMin = selected.waterMax }}
-            />
-          </label>
-        </div>
 
         <div class="threshold-row">
           <span class="threshold-label">☀️ Light DLI</span>
@@ -105,6 +83,30 @@
               max="50"
               bind:value={selected.lightMax}
               onchange={() => { if (selected.lightMax < selected.lightMin) selected.lightMin = selected.lightMax }}
+            />
+          </label>
+        </div>
+
+        <div class="threshold-row">
+          <span class="threshold-label">💧 Water %</span>
+          <label class="threshold-field">
+            Min
+            <input
+              type="number"
+              min="0"
+              max="100"
+              bind:value={selected.waterMin}
+              onchange={() => { if (selected.waterMin > selected.waterMax) selected.waterMax = selected.waterMin }}
+            />
+          </label>
+          <label class="threshold-field">
+            Max
+            <input
+              type="number"
+              min="0"
+              max="100"
+              bind:value={selected.waterMax}
+              onchange={() => { if (selected.waterMax < selected.waterMin) selected.waterMin = selected.waterMax }}
             />
           </label>
         </div>
@@ -154,8 +156,8 @@
             </div>
             <span class="plant-card-room">{plant.room}</span>
             <div class="plant-card-stats">
-              <span title="Water">💧 {plant.water}%</span>
               <span title="Sunlight">☀️ {plant.light} DLI</span>
+              <span title="Water">💧 {plant.water}%</span>
               <span title="Temperature">🌡️ {plant.temp}°F</span>
             </div>
             <span class="plant-card-watered">Watered {plant.lastWatered}</span>
