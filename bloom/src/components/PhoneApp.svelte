@@ -1,5 +1,5 @@
 <script>
-  import { statusLabel, statusColor, ROOMS } from '../lib/plants'
+  import { statusLabel, statusColor } from '../lib/plants'
 
   /** @type {{ plants: any[], onSelectPlant?: (id: string) => void }} */
   let { plants, onSelectPlant } = $props()
@@ -17,6 +17,36 @@
 
   function closePlant() {
     selectedId = null
+  }
+
+  function addPlant() {
+    const id = `p-${Date.now()}`
+    plants.push({
+      id,
+      name: 'New Plant',
+      room: '',
+      water: 50,
+      waterMin: 30,
+      waterMax: 70,
+      light: 15,
+      lightMin: 10,
+      lightMax: 25,
+      temp: 72,
+      tempMin: 65,
+      tempMax: 80,
+      lastWatered: 'Just now',
+      autoWater: false,
+      notifications: true,
+    })
+    openPlant(id)
+  }
+
+  /** @param {string} id @param {string} name */
+  function removePlant(id, name) {
+    if (!confirm(`Remove ${name}?`)) return
+    const index = plants.findIndex((p) => p.id === id)
+    if (index !== -1) plants.splice(index, 1)
+    if (selectedId === id) closePlant()
   }
 </script>
 
@@ -36,11 +66,7 @@
 
       <label class="detail-field">
         Location
-        <select bind:value={selected.room}>
-          {#each ROOMS as room}
-            <option value={room}>{room}</option>
-          {/each}
-        </select>
+        <input type="text" bind:value={selected.room} />
     </label>
 
       <div class="detail-stats">
@@ -137,7 +163,7 @@
       </div>
 
       <div class="detail-section">
-        <button class="remove-button">Remove plant</button>
+        <button class="remove-button" onclick={() => removePlant(selected.id, selected.name)}>Remove plant</button>
       </div>
     </div>
   {:else}
@@ -164,6 +190,10 @@
           </div>
         </button>
       {/each}
+    </div>
+
+    <div class="add-plant-bar">
+      <button class="add-plant-button" onclick={addPlant}>+ Add plant</button>
     </div>
   {/if}
 </div>
@@ -220,6 +250,30 @@
 
   .plant-card:hover {
     border-color: var(--text-h);
+  }
+
+  .add-plant-bar {
+    flex: 0 0 auto;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+  }
+
+  .add-plant-button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    color: #4caf50;
+    border-color: #4caf50;
+  }
+
+  .add-plant-button:hover {
+    background: rgba(76, 175, 80, 0.1);
   }
 
   .plant-card-body {
