@@ -1,12 +1,23 @@
 <script>
   import { onMount } from 'svelte'
-  import { createSensors, adjust, isOutOfRange } from './lib/sensors'
+  import { createPlantSensors, adjust, isOutOfRange } from './lib/sensors'
+  import { createPlants } from './lib/plants'
   import Sensor from './components/Sensor.svelte'
+  import PhoneApp from './components/PhoneApp.svelte'
 
   /** @type {string | null} */
   let expandedLabel = $state(null)
 
-  let sensors = $state(createSensors())
+  let plants = $state(createPlants())
+
+  // the plant currently shown in the middle panel; defaults to the first plant listed
+  /** @type {string | null} */
+  let viewedPlantId = $state(plants[0]?.id ?? null)
+
+  const selectedPlant = $derived(plants.find((p) => p.id === viewedPlantId) ?? null)
+
+  // the middle panel always shows a real plant's water/light/temp data
+  const displaySensors = $derived(selectedPlant ? createPlantSensors(selectedPlant) : [])
 
   const startupTime = new Date()
   const timeString = startupTime.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
@@ -38,7 +49,7 @@
       <div class="top-bar-author">Isaac Dowdy</div>
     </div>
     <div class="top-bar-controls">
-      {#each sensors as sensor}
+      {#each displaySensors as sensor}
         <div class="sensor-controls">
           <span class="sensor-icon" title={sensor.label} aria-hidden="true">{sensor.icon}</span>
           <button aria-label="Decrease {sensor.label}" onclick={() => adjust(sensor, -sensor.step)}>−</button>
@@ -52,32 +63,40 @@
   </header>
 
   <main class="panels">
+    <section class="panel panel-phone">
+      <PhoneApp {plants} onSelectPlant={(id) => (viewedPlantId = id)} />
+    </section>
     <section class="panel panel-pot">
       <div class="panel-pot-lip">
         <div class="pot-top">
+          <div class="pot-clock">
+            <span class="pot-time">{timeString}</span>
+            <span class="pot-date">{dateString}</span>
+          </div>
           <div class="pot-icons">
-            {#each sensors as sensor}
+            {#each displaySensors as sensor}
               {#if isOutOfRange(sensor)}
                 <span class="pot-icon" style="color: {sensor.color}" title="{sensor.label} out of range" aria-hidden="true">{sensor.icon}</span>
               {/if}
             {/each}
           </div>
-          <div class="pot-clock">
-            <span class="pot-time">{timeString}</span>
-            <span class="pot-date">{dateString}</span>
-          </div>
+          
         </div>
       </div>
       <div class="panel-pot-main">
         <div class="sensor-list">
-          {#each sensors as sensor}
+          {#each displaySensors as sensor}
             <Sensor {sensor} expanded={expandedLabel === sensor.label} onToggleExpand={() => toggleExpand(sensor)} />
           {/each}
         </div>
       </div>
-    </section>
 
-    <section class="panel panel-phone">Mock secondary device goes here (might swap this to the left later)</section>
+      {#if selectedPlant}
+        <div class="toast-list">
+          <div class="toast">{selectedPlant.name}</div>
+        </div>
+      {/if}
+    </section>
 
     <section class="panel panel-mockup">Pot image/mockup goes here</section>
   </main>

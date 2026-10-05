@@ -91,7 +91,8 @@ p {
 }
 
 .panel {
-  border-right: 1px solid var(--border);
+  border-right: 4px solid var(--border);
+  border-top: 4px solid var(--border);
   padding: 12px;
   overflow: auto;
 }
@@ -392,4 +393,15 @@ p {
 .panel-phone,
 .panel-mockup {
   flex: 1 1 0;
+}
+
+.pot-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.pot-room {
+  font-size: 14px;
+  color: var(--text);
 }
