@@ -32,15 +32,16 @@ export function createSensors() {
 
 /** static metadata (icon/color/absolute range) for each plant metric, keyed by plant field name */
 const PLANT_SENSOR_META = {
-  light: { label: 'Sunlight', icon: '☀️', color: '#f5a623', min: 0, max: 50, unit: ' DLI', step: 2, valueKey: 'light', minKey: 'lightMin', maxKey: 'lightMax' },
-  water: { label: 'Water', icon: '💧', color: '#2f8fd1', min: 0, max: 100, unit: '%', step: 2, valueKey: 'water', minKey: 'waterMin', maxKey: 'waterMax' },
-  temp: { label: 'Temperature', icon: '🌡️', color: '#e5533d', min: 32, max: 100, unit: '°F', step: 1, valueKey: 'temp', minKey: 'tempMin', maxKey: 'tempMax' },
+  light: { label: 'Sunlight', icon: '☀️', color: '#f5a623', min: 0, max: 50, unit: ' DLI', step: 2, valueKey: 'light', minKey: 'lightMin', maxKey: 'lightMax', historyKey: 'lightHistory' },
+  water: { label: 'Water', icon: '💧', color: '#2f8fd1', min: 0, max: 100, unit: '%', step: 2, valueKey: 'water', minKey: 'waterMin', maxKey: 'waterMax', historyKey: 'waterHistory' },
+  temp: { label: 'Temperature', icon: '🌡️', color: '#e5533d', min: 32, max: 100, unit: '°F', step: 1, valueKey: 'temp', minKey: 'tempMin', maxKey: 'tempMax', historyKey: 'tempHistory' },
 }
 
 /**
  * Builds sensor-shaped objects (same shape as createSensors()) backed by a plant's own
  * water/light/temp fields, so reading/writing .value, .idealMin, .idealMax reads from and
- * writes back to the underlying plant.
+ * writes back to the underlying plant. .history reads the plant's live rolling log, so it
+ * updates in place as the simulation (or manual +/- controls) changes the plant's readings.
  * @param {import('./plants').Plant} plant
  * @returns {Sensor[]}
  */
@@ -71,7 +72,9 @@ export function createPlantSensors(plant) {
     set idealMax(v) {
       plant[meta.maxKey] = v
     },
-    history: generateHistory(plant[meta.minKey], plant[meta.maxKey], meta.min, meta.max),
+    get history() {
+      return plant[meta.historyKey]
+    },
   }))
 }
 

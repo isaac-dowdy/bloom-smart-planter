@@ -79,6 +79,53 @@ p {
   gap: 16px;
 }
 
+.top-bar-sim {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #4caf50;
+  background: none;
+  color: #4caf50;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sim-button:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.sim-button--active {
+  border-color: #e5533d;
+  color: #e5533d;
+}
+
+.sim-button--active:hover {
+  background: rgba(229, 83, 61, 0.1);
+}
+
+.sim-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.sim-progress-fill {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s linear;
+}
+
 .top-bar-info {
   flex: 1 1 auto;
   text-align: right;
@@ -259,6 +306,11 @@ p {
   border-color: var(--text-h);
 }
 
+.sensor-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .sensor-bracket-value {
   position: absolute;
   top: 100%;
@@ -388,6 +440,13 @@ p {
   border-radius: 8px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   color: var(--text-h);
+}
+
+.panel-pot .toast--event {
+  border-color: #4caf50;
+  color: #2e7d32;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .panel-phone,

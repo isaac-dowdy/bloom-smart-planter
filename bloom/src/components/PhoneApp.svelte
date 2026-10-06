@@ -1,5 +1,6 @@
 <script>
   import { statusLabel, statusColor } from '../lib/plants'
+  import { generateHistory } from '../lib/utils'
 
   /** @type {{ plants: any[], onSelectPlant?: (id: string) => void }} */
   let { plants, onSelectPlant } = $props()
@@ -34,9 +35,12 @@
       temp: 72,
       tempMin: 65,
       tempMax: 80,
-      lastWatered: 'Just now',
-      autoWater: false,
+      lastWatered: 'today',
       notifications: true,
+      wateringIntervalDays: 7,
+      waterHistory: generateHistory(30, 70, 0, 100),
+      lightHistory: generateHistory(10, 25, 0, 50),
+      tempHistory: generateHistory(65, 80, 32, 100),
     })
     openPlant(id)
   }
