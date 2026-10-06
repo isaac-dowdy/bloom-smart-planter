@@ -43,36 +43,21 @@
   // are crossed) so every sensor bar, sparkline, status dot, and the pot clock animate live.
   let simulating = $state(false)
   let simHoursElapsed = $state(0)
-  /** @type {{ id: number, text: string }[]} */
-  let simToasts = $state([])
-  let simToastSeq = 0
   /** @type {ReturnType<typeof setInterval> | undefined} */
   let simInterval
 
   const simulatedNow = $derived(new Date(startupTime.getTime() + simHoursElapsed * 60 * 60 * 1000))
   const simProgressPercent = $derived(Math.min(100, (simHoursElapsed / SIM_DURATION_HOURS) * 100))
 
-  /** @param {string} text */
-  function addSimToast(text) {
-    const id = ++simToastSeq
-    simToasts.push({ id, text })
-    setTimeout(() => {
-      const index = simToasts.findIndex((t) => t.id === id)
-      if (index !== -1) simToasts.splice(index, 1)
-    }, 4000)
-  }
-
   function startSimulation() {
     if (simulating) return
     simulating = true
     simHoursElapsed = 0
-    simToasts = []
     for (const plant of plants) /** @type {any} */ (plant)._waterRemainder = 0
     simInterval = setInterval(() => {
       simHoursElapsed += 1
       const hourOfDay = simHoursElapsed % 24
-      const wateredPlants = simulateHour(plants, hourOfDay)
-      for (const plant of wateredPlants) addSimToast(`${plant.name} auto-watered`)
+      simulateHour(plants, hourOfDay)
       if (simHoursElapsed >= SIM_DURATION_HOURS) stopSimulation()
     }, 350)
   }
@@ -121,9 +106,6 @@
         </div>
       {/if}
     </div>
-    <div class="top-bar-info">
-      <p>Project information</p>
-    </div>
   </header>
 
   <main class="panels">
@@ -155,18 +137,42 @@
         </div>
       </div>
 
-      {#if selectedPlant || simToasts.length}
+      {#if selectedPlant}
         <div class="toast-list">
-          {#each simToasts as toast (toast.id)}
-            <div class="toast toast--event">{toast.text}</div>
-          {/each}
-          {#if selectedPlant}
-            <div class="toast">{selectedPlant.name}</div>
-          {/if}
+          <div class="toast">{selectedPlant.name}</div>
         </div>
       {/if}
     </section>
 
-    <section class="panel panel-mockup">Pot image/mockup goes here</section>
+    <section class="panel panel-mockup">
+      <div class="about">
+        <h2>About this project</h2>
+        <p>
+          <a href="https://github.com/isaac-dowdy/bloom-smart-planter" target="_blank" rel="noopener noreferrer">
+            github.com/isaac-dowdy/bloom-smart-planter
+          </a>
+        </p>
+
+        <h3>Mobile app (left)</h3>
+        <p>
+          The companion phone app. It lists every plant with a status dot and its light, water, and temperature
+          readings. Tap a plant to rename it, set its location, and edit its min/max care thresholds, or to remove it.
+          Use "+ Add plant" to add a new one. Selecting a plant here also chooses which plant the pot displays.
+        </p>
+
+        <h3>Pot lip (top of middle panel)</h3>
+        <p>
+          The small status strip along the rim of the pot. It shows the current time and date (or the simulated time
+          while "Simulate a day" runs) and displays an icon for any sensor that is currently out of its ideal range.
+        </p>
+
+        <h3>Main pot display (middle panel)</h3>
+        <p>
+          The pot's live readout for the selected plant. Water, light, and temperature each get a bar showing the
+          current value against the ideal range, plus a recent-history sparkline. Click a sensor to expand it for
+          minimum, maximum, and average values and a longer history chart. The plant's name appears in the corner.
+        </p>
+      </div>
+    </section>
   </main>
 </div>

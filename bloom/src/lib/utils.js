@@ -27,9 +27,12 @@ export function historyStats(sensor) {
   return { min, max, avg: Math.round(avg * 10) / 10 }
 }
 
+/** how many samples the rolling sparkline/history buffers keep (one per simulated hour) */
+export const HISTORY_LENGTH = 48
+
 /** deterministic wavy sample data so the sparkline/expanded charts render a static graph */
 /** @param {number} idealMin @param {number} idealMax @param {number} min @param {number} max @param {number} points */
-export function generateHistory(idealMin, idealMax, min, max, points = 40) {
+export function generateHistory(idealMin, idealMax, min, max, points = HISTORY_LENGTH) {
   const center = (idealMin + idealMax) / 2
   const amplitude = (idealMax - idealMin) / 2 || (max - min) / 8
   const history = []

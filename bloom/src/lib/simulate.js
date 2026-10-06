@@ -7,8 +7,7 @@
  * Everything is deterministic (no randomness) so the same run always tells the same story.
  */
 
-/** how many samples the rolling sparkline history keeps */
-export const HISTORY_LENGTH = 40
+import { HISTORY_LENGTH } from './utils'
 
 /** how many simulated hours make up one run of the simulation */
 export const SIM_DURATION_HOURS = 24

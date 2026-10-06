@@ -77,6 +77,7 @@ p {
 .top-bar-controls {
   display: flex;
   gap: 16px;
+  margin-left: auto;
 }
 
 .top-bar-sim {
@@ -124,11 +125,6 @@ p {
   height: 100%;
   background: #4caf50;
   transition: width 0.3s linear;
-}
-
-.top-bar-info {
-  flex: 1 1 auto;
-  text-align: right;
 }
 
 .panels {
@@ -216,6 +212,16 @@ p {
 
 .sensor-value {
   margin-left: auto;
+}
+
+.sensor-caret {
+  font-size: 12px;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.sensor--expanded .sensor-caret {
+  transform: rotate(180deg);
 }
 
 .sr-only {
@@ -399,28 +405,57 @@ p {
 
 .sensor-expanded {
   cursor: default;
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
-.sensor-expanded-chart svg {
-  display: block;
+.sensor-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+.sensor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.sensor-card-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.sensor-card-value {
+  font-size: 15px;
+  font-weight: 700;
   color: var(--text-h);
 }
 
-.sensor-stats {
-  display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: var(--text);
-  margin: 8px 0;
+.sensor-card--chart {
+  grid-column: 1 / -1;
+}
+
+.sensor-card-chart {
+  display: block;
+  color: var(--text-h);
+  margin-top: 2px;
 }
 
 .sensor-expanded-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 10px;
 }
 
 .panel-pot .toast-list {
@@ -442,16 +477,32 @@ p {
   color: var(--text-h);
 }
 
-.panel-pot .toast--event {
-  border-color: #4caf50;
-  color: #2e7d32;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 .panel-phone,
 .panel-mockup {
   flex: 1 1 0;
+}
+
+.about {
+  text-align: left;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.about h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: var(--text-h);
+}
+
+.about h3 {
+  margin: 20px 0 4px;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.about p {
+  margin: 0;
+  font-size: 14px;
 }
 
 .pot-name {
