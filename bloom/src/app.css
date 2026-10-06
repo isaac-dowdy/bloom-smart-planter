@@ -77,6 +77,7 @@ p {
 .top-bar-controls {
   display: flex;
   gap: 16px;
+  margin-left: auto;
 }
 
 .top-bar-sim {
@@ -124,11 +125,6 @@ p {
   height: 100%;
   background: #4caf50;
   transition: width 0.3s linear;
-}
-
-.top-bar-info {
-  flex: 1 1 auto;
-  text-align: right;
 }
 
 .panels {
@@ -484,6 +480,29 @@ p {
 .panel-phone,
 .panel-mockup {
   flex: 1 1 0;
+}
+
+.about {
+  text-align: left;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.about h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: var(--text-h);
+}
+
+.about h3 {
+  margin: 20px 0 4px;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.about p {
+  margin: 0;
+  font-size: 14px;
 }
 
 .pot-name {

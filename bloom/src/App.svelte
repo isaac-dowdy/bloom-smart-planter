@@ -106,9 +106,6 @@
         </div>
       {/if}
     </div>
-    <div class="top-bar-info">
-      <p>Project information</p>
-    </div>
   </header>
 
   <main class="panels">
@@ -147,6 +144,35 @@
       {/if}
     </section>
 
-    <section class="panel panel-mockup">Pot image/mockup goes here</section>
+    <section class="panel panel-mockup">
+      <div class="about">
+        <h2>About this project</h2>
+        <p>
+          <a href="https://github.com/isaac-dowdy/bloom-smart-planter" target="_blank" rel="noopener noreferrer">
+            github.com/isaac-dowdy/bloom-smart-planter
+          </a>
+        </p>
+
+        <h3>Mobile app (left)</h3>
+        <p>
+          The companion phone app. It lists every plant with a status dot and its light, water, and temperature
+          readings. Tap a plant to rename it, set its location, and edit its min/max care thresholds, or to remove it.
+          Use "+ Add plant" to add a new one. Selecting a plant here also chooses which plant the pot displays.
+        </p>
+
+        <h3>Pot lip (top of middle panel)</h3>
+        <p>
+          The small status strip along the rim of the pot. It shows the current time and date (or the simulated time
+          while "Simulate a day" runs) and displays an icon for any sensor that is currently out of its ideal range.
+        </p>
+
+        <h3>Main pot display (middle panel)</h3>
+        <p>
+          The pot's live readout for the selected plant. Water, light, and temperature each get a bar showing the
+          current value against the ideal range, plus a recent-history sparkline. Click a sensor to expand it for
+          minimum, maximum, and average values and a longer history chart. The plant's name appears in the corner.
+        </p>
+      </div>
+    </section>
   </main>
 </div>
