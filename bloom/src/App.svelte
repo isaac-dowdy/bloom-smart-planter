@@ -43,36 +43,21 @@
   // are crossed) so every sensor bar, sparkline, status dot, and the pot clock animate live.
   let simulating = $state(false)
   let simHoursElapsed = $state(0)
-  /** @type {{ id: number, text: string }[]} */
-  let simToasts = $state([])
-  let simToastSeq = 0
   /** @type {ReturnType<typeof setInterval> | undefined} */
   let simInterval
 
   const simulatedNow = $derived(new Date(startupTime.getTime() + simHoursElapsed * 60 * 60 * 1000))
   const simProgressPercent = $derived(Math.min(100, (simHoursElapsed / SIM_DURATION_HOURS) * 100))
 
-  /** @param {string} text */
-  function addSimToast(text) {
-    const id = ++simToastSeq
-    simToasts.push({ id, text })
-    setTimeout(() => {
-      const index = simToasts.findIndex((t) => t.id === id)
-      if (index !== -1) simToasts.splice(index, 1)
-    }, 4000)
-  }
-
   function startSimulation() {
     if (simulating) return
     simulating = true
     simHoursElapsed = 0
-    simToasts = []
     for (const plant of plants) /** @type {any} */ (plant)._waterRemainder = 0
     simInterval = setInterval(() => {
       simHoursElapsed += 1
       const hourOfDay = simHoursElapsed % 24
-      const wateredPlants = simulateHour(plants, hourOfDay)
-      for (const plant of wateredPlants) addSimToast(`${plant.name} auto-watered`)
+      simulateHour(plants, hourOfDay)
       if (simHoursElapsed >= SIM_DURATION_HOURS) stopSimulation()
     }, 350)
   }
@@ -155,14 +140,9 @@
         </div>
       </div>
 
-      {#if selectedPlant || simToasts.length}
+      {#if selectedPlant}
         <div class="toast-list">
-          {#each simToasts as toast (toast.id)}
-            <div class="toast toast--event">{toast.text}</div>
-          {/each}
-          {#if selectedPlant}
-            <div class="toast">{selectedPlant.name}</div>
-          {/if}
+          <div class="toast">{selectedPlant.name}</div>
         </div>
       {/if}
     </section>

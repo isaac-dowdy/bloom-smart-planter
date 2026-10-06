@@ -24,6 +24,7 @@
     <span class="sensor-icon" title={sensor.label} aria-hidden="true">{sensor.icon}</span>
     <span class="sr-only">{sensor.label}</span>
     <span class="sensor-value">{sensor.value}{sensor.unit}</span>
+    <span class="sensor-caret" aria-hidden="true">▼</span>
   </div>
   <div class="sensor-bar">
     <div
@@ -43,24 +44,37 @@
     <span>{sensor.min}{sensor.unit}</span>
     <span>{sensor.max}{sensor.unit}</span>
   </div>
-  <div class="sensor-sparkline">
-    <svg width="120" height="30" viewBox="0 0 120 30" preserveAspectRatio="none">
-      <polyline fill="none" stroke="currentColor" stroke-width="1.5" points={sparklinePoints(sensor.history, 120, 30)} />
-    </svg>
-  </div>
+  {#if !expanded}
+    <div class="sensor-sparkline">
+      <svg width="120" height="30" viewBox="0 0 120 30" preserveAspectRatio="none">
+        <polyline fill="none" stroke="currentColor" stroke-width="1.5" points={sparklinePoints(sensor.history, 120, 30)} />
+      </svg>
+    </div>
+  {/if}
 
   {#if expanded}
     {@const stats = historyStats(sensor)}
+    {@const sampleCount = sensor.history?.length ?? 0}
     <div class="sensor-expanded" role="group">
-      <div class="sensor-expanded-chart">
-        <svg width="100%" height="120" viewBox="0 0 480 120" preserveAspectRatio="none">
-          <polyline fill="none" stroke="currentColor" stroke-width="2" points={sparklinePoints(sensor.history, 480, 120)} />
-        </svg>
-      </div>
-      <div class="sensor-stats">
-        <span>min {stats.min}{sensor.unit}</span>
-        <span>avg {stats.avg}{sensor.unit}</span>
-        <span>max {stats.max}{sensor.unit}</span>
+      <div class="sensor-cards">
+        <div class="sensor-card">
+          <span class="sensor-card-label">Minimum</span>
+          <span class="sensor-card-value">{stats.min}{sensor.unit}</span>
+        </div>
+        <div class="sensor-card">
+          <span class="sensor-card-label">Maximum</span>
+          <span class="sensor-card-value">{stats.max}{sensor.unit}</span>
+        </div>
+        <div class="sensor-card">
+          <span class="sensor-card-label">Average</span>
+          <span class="sensor-card-value">{stats.avg}{sensor.unit}</span>
+        </div>
+        <div class="sensor-card sensor-card--chart">
+          <span class="sensor-card-label">{sensor.label} over last {sampleCount}h</span>
+          <svg class="sensor-card-chart" width="100%" height="48" viewBox="0 0 480 48" preserveAspectRatio="none">
+            <polyline fill="none" stroke="currentColor" stroke-width="2" points={sparklinePoints(sensor.history, 480, 48)} />
+          </svg>
+        </div>
       </div>
       <div class="sensor-expanded-controls">
         <label class="slider-label">
